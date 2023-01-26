@@ -1,6 +1,10 @@
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/sixstepsaway/Simple-Rimpy-Mod-Folder-Renamer?style=flat-square) ![GitHub](https://img.shields.io/github/license/sixstepsaway/Simple-Rimpy-Mod-Folder-Renamer?style=flat-square) ![GitHub all releases](https://img.shields.io/github/downloads/sixstepsaway/Simple-Rimpy-Mod-Folder-Renamer/total) ![built in powershell](https://img.shields.io/badge/built%20in-powershell-informational)
+
 # Simple-Rimpy-Mod-Folder-Renamer
 
-(a big chunk of the info below was originally posted to r/Rimworld.)
+## [Skip to "How to Use"](#how-to-use)
+
+(the info below was originally posted to r/Rimworld.)
 
 I'm really organized. I'm, like, annoyingly organized and have, in the past, been asked why modding is so fun for me and honestly the organization is probably why. I'm also used to modding things like Minecraft (ah, the delight of being able to have 10k separate modpacks) or the Sims (sub-folders. SUB-FOLDERS), so although Rimpy is great, it isn't as organized as I'd like.
 
