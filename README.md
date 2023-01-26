@@ -2,7 +2,11 @@
 
 # Simple-Rimpy-Mod-Folder-Renamer
 
-## [Skip to "How to Use"](#how-to-use)
+### Contents: 
+
+- [How to Use](#how-to-use)
+- [Questions/FAQ](#questions-i-can-imagine-being-asked)
+- [License](#license)
 
 (the info below was originally posted to r/Rimworld.)
 
