@@ -19,24 +19,21 @@ Function Start-RenameFoldersFromXML {
     <#to add another match to this list, simply hit enter after the last match (for example: "/") and add your own in double quotes (for example: "^"). This character will be removed from any file names.#>)
     $replacelist = ""
 
-    $numberOfSubFolders = $folderList.Count
-    foreach ($folder in $folderList) {
-        $Completed = ($i/$numberOfSubFolders) * 100
-        Write-Progress -Id 1 -Activity "Parsing Folders" -Status "Progress: " -PercentComplete $Completed
-        Write-Verbose "Parsing $($folder.BaseName)."
-        [xml]$xml = Get-Content "$folder\About\About.xml"
-        Write-Verbose "Parsing XML at $folder\About\About.xml."
+    foreach ($subfolder in $folderList) {
+        Write-Verbose "Parsing $($subfolder.BaseName)."
+        [xml]$xml = Get-Content "$subfolder\About\About.xml"
+        Write-Verbose "Parsing XML at $subfolder\About\About.xml."
         $newName = $xml.ModMetaData.name
         for ($i=0; $matchlist.Count -gt $i; $i++) {
             $newName = $newName -replace [regex]::Escape($matchlist[$i]),$replacelist
         }
-        $newname = "$newName`_$($folder.BaseName)"
+        $newname = "$newName`_$($subfolder.BaseName)"
         Write-Verbose "New name will be $newName."
         if ($debugMode -eq 0) {
-            Rename-Item $folder -NewName $newName -WhatIf
+            Rename-Item $subfolder -NewName $newName -WhatIf
             Write-Verbose "File has not been renamed as script is running in debug mode."
         } else {
-            Rename-Item $folder -NewName $newName
+            Rename-Item $subfolder -NewName $newName
         }
         Continue
     }
@@ -49,18 +46,16 @@ Function Start-UndoRename {
 
     $folderList = Get-ChildItem $location -Directory
 
-    $numberOfSubFolders = $folderList.Count
-    foreach ($folder in $folderList) {
-        $Completed = ($i/$numberOfSubFolders) * 100
-        Write-Progress -Id 2 -Activity "Parsing Folders" -Status "Progress: " -PercentComplete $Completed
-        Write-Verbose "Parsing $($folder.BaseName)." 
-        $newName = $folder.BaseName -replace "(\d\d\d+)","\1"   
+    foreach ($item in $folderList) {
+        Write-Verbose "Parsing $($item.BaseName)." 
+        $item.BaseName -match "(\d\d\d\d\d+)" | Out-Null
+        $newname = $($matches[0])
         Write-Verbose "New name will be $newName."
         if ($debugMode -eq 0) {
-            Rename-Item $folder -NewName $newName -WhatIf
+            Rename-Item $item -NewName $newName -WhatIf
             Write-Verbose "File has not been renamed as script is running in debug mode."
         } else {
-            Rename-Item $folder -NewName $newName
+            Rename-Item $item -NewName $newName
         }
         Continue
     }
@@ -75,7 +70,7 @@ Function Start-GetSteamIDs {
         [string]$folders
     )
     $script:steamIDs = @()
-    $foldersfull = Get-ChildItem "C:\GOG Games\Mods Organized"
+    $foldersfull = Get-ChildItem $folders
     foreach ($folder in $foldersfull) {
         if ($folder.BaseName -ne "04a_Options - NSFW" -and $folder.BaseName -ne "00_Outside Mods") {
             $subfolders = Get-ChildItem $folder
@@ -111,7 +106,7 @@ $redownload = $Host.UI.PromptForChoice("Redownload", "Are you getting the IDs fo
 
 if ($redownload -eq 0) { 
     $originalfolders = Read-Host "Where is the folder full of folders? (For example: C:\Games\Rimworld\Mods)"
-    $steamscriptfolder = Read-Host "Save script where? (folder only, script will be named steamscript.txt"
+    $steamscriptfolder = Read-Host "Save script where? (folder only, script will be named steamscript.txt)"
     Start-GetSteamIDs -folders $originalfolders
     Start-MakeSteamScript -steamscriptfolder $steamscriptfolder
 } elseif ($redownload -eq 1) {
@@ -130,12 +125,12 @@ if ($redownload -eq 0) {
 
     if ($undo -eq 1) {
         if ($alreadySubfolders -eq 1) {
-            $foldertoparse = Read-Host "Where is the folder full of folders? (For example: C:\Games\Rimworld\Mods)"
-            Start-RenameFoldersFromXML -location $foldertoparse
+            $inputfolder = Read-Host "Where is the folder full of folders? (For example: C:\Games\Rimworld\Mods)"
+            Start-RenameFoldersFromXML -location $inputfolder
         } elseif ($alreadySubfolders -eq 0) {
-            $foldertoparse = Read-Host "Where is the folder full of semi-organized folders? (For example: C:\Games\Rimworld\Mods which contains folders like `"Factions`" and `"Animals`")"
-            $foldertoparse = Get-ChildItem "C:\GOG Games\Mods Organized"
-            $NumberOfFolders = $folderthatcontainsfolders.Count
+            $inputfolder = Read-Host "Where is the folder full of semi-organized folders? (For example: C:\Games\Rimworld\Mods which contains folders like `"Factions`" and `"Animals`")"
+            $foldertoparse = Get-ChildItem $inputfolder
+            $NumberOfFolders = $foldertoparse.Count
             foreach ($folder in $foldertoparse) {    
                 $Completed = ($i/$NumberOfFolders) * 100
                 Write-Progress -Id 0 -Activity "Parsing Containing Folders" -Status "Progress: " -PercentComplete $Completed
@@ -151,7 +146,6 @@ if ($redownload -eq 0) {
                 Start-UndoRename -location $foldertoparse
         } elseif ($alreadySubfolders -eq 0) {
             $foldertoparse = Read-Host "Where is the folder full of semi-organized folders? (For example: C:\Games\Rimworld\Mods which contains folders like `"Factions`" and `"Animals`")"
-            $foldertoparse = Get-ChildItem "C:\GOG Games\Mods Organized"
             $NumberOfFolders = $folderthatcontainsfolders.Count
             foreach ($folder in $foldertoparse) {    
                 $Completed = ($i/$NumberOfFolders) * 100
